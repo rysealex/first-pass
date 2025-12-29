@@ -41,10 +41,13 @@ def job_action():
         job = conn.execute(
             "SELECT * FROM jobs WHERE id = ?", (job_id,)
         ).fetchone()
-        # trigger email logic here later
-        conn.execute(
-            "UPDATE jobs SET status = 'saved' WHERE id = ?", (job_id,)
-        )
+        # trigger email logic
+        if job:
+            mailer.send_job_link(job['link'], job['company'], job['role'])
+            # mark as saved in the db
+            conn.execute(
+                "UPDATE jobs SET status = 'saved' WHERE id = ?", (job_id,)
+            )
     else:
         conn.execute(
             "UPDATE jobs SET status = 'deleted' WHERE id = ?", (job_id,)
