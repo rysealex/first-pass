@@ -22,7 +22,7 @@ def save_job(job_id, company, role, link, source):
         cursor.execute("""
             INSERT INTO jobs (job_id, company, role, link, source)
             VALUES (?, ?, ?, ?, ?)
-        """, job_id, company, role, link, source)
+        """, (job_id, company, role, link, source))
 
         conn.commit()
         print(f"New Job Found: {company} - {role}")
