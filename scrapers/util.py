@@ -10,7 +10,11 @@ def init_audio():
 
 def play_notification():
     try:
-        mixer.music.load('../static/audio/notify.mp3')
+        if mixer.music.get_busy():
+            print("Audio skipped: Notification already playing")
+            return
+        
+        mixer.music.load('../static/audio/yeat.mp3')
         mixer.music.play()
     except Exception as e:
         print(f"Audio error: {e}")
@@ -27,7 +31,7 @@ def save_job(job_id, company, role, link, source):
 
         conn.commit()
         print(f"New Job Found: {company} - {role}")
-        # play_notification()
+        play_notification()
         return True
     except sqlite3.IntegrityError:
         # triggers if job is a duplicate
