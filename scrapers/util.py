@@ -2,7 +2,8 @@ import sqlite3
 import os
 from pygame import mixer
 
-DB_PATH = os.path.join(os.path.dirname(__file__), '../data/jobs.db')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(BASE_DIR, 'data', 'jobs.db')
 
 def init_audio():
     mixer.init()
@@ -26,7 +27,7 @@ def save_job(job_id, company, role, link, source):
 
         conn.commit()
         print(f"New Job Found: {company} - {role}")
-        play_notification()
+        # play_notification()
         return True
     except sqlite3.IntegrityError:
         # triggers if job is a duplicate

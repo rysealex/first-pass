@@ -15,7 +15,7 @@ def run_simplify_scraper():
         for job in jobs:
             # URL is unique ID to avoid duplicate jobs
             job_url = job.get('url')
-            company = job.get('company')
+            company = job.get('company_name')
             role = job.get('title')
 
             # save the job to the db and play notification sound
