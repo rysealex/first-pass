@@ -16,43 +16,60 @@
 
 	<script>
 		async function fetchJobs() {
-			const response = await fetch('/api/jobs');
-			const jobs = await response.json();
-			const container = document.getElementById('job-list');
+			console.log("Attempting to fetch jobs...");
+			try {
+				const response = await fetch('/api/jobs');
+				if (!response.ok) throw new Error('Network response was not ok');
 				
-			container.innerHTML = jobs.length ? '' : '<p class="p-8 text-center text-gray-500">No new applications. Rest up!</p>';
+				const jobs = await response.json();
+				console.log("Jobs received:", jobs);
+				
+				const container = document.getElementById('job-list');
+				if (!container) return;
 
-			jobs.forEach(job => {
-				const row = `
-					<div class="flex items-center justify-between p-4 hover:bg-blue-50 transition group">
-						<a href="${job.link}" target="_blank" class="flex-1 flex items-center decoration-transparent">
-							<span class="font-bold text-gray-900 w-48 inline-block truncate">${job.company}</span>
-							<span class="text-gray-600 truncate">${job.role}</span>
-							<svg class="w-4 h-4 ml-2 text-gray-400 opacity-0 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-							</svg>
-						</a>
-						<div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
-							<button onclick="handleAction(${job.id}, 'save')" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm shadow-sm">Save to Email</button>
-							<button onclick="handleAction(${job.id}, 'delete')" class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm shadow-sm">Delete</button>
-						</div>
-					</div>`;
-				container.innerHTML += row;
-			});
+				if (jobs.length === 0) {
+					container.innerHTML = '<p class="p-8 text-center text-gray-500">No new applications. Rest up!</p>';
+					return;
+				}
+
+				let htmlContent = '';
+				jobs.forEach(job => {
+					htmlContent += `
+						<div class="flex items-center justify-between p-4 hover:bg-blue-50 transition group">
+							<a href="${job.link}" target="_blank" class="flex-1 flex items-center decoration-transparent">
+								<span class="font-bold text-gray-900 w-48 inline-block truncate">${job.company}</span>
+								<span class="text-gray-600 truncate">${job.role}</span>
+								<span class="ml-2 px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">${job.source}</span>
+							</a>
+							<div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
+								<button onclick="handleAction(${job.id}, 'save')" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm shadow-sm">Save to Email</button>
+								<button onclick="handleAction(${job.id}, 'delete')" class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm shadow-sm">Delete</button>
+							</div>
+						</div>`;
+				});
+				container.innerHTML = htmlContent;
+			} catch (error) {
+				console.error("Error in fetchJobs:", error);
+			}
 		}
 
-		async function handleAction(id, action) {
-			await fetch('/api/action', {
+    async function handleAction(id, action) {
+			console.log(`Performing ${action} on job ${id}`);
+			const response = await fetch('/api/action', {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({ id, action })
 			});
-			fetchJobs(); // Refresh the list
-		}
+			if (response.ok) {
+				fetchJobs(); // Refresh
+			}
+    }
 
-		// Poll for new jobs every 30 seconds
-		setInterval(fetchJobs, 30000);
-		fetchJobs();
+    // Initialize once the page is fully loaded
+    window.onload = () => {
+			fetchJobs();
+			setInterval(fetchJobs, 600000);
+    };
 	</script>
 </body>
 </html>

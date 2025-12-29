@@ -4,7 +4,8 @@ import os
 import mailer
 
 app = Flask(__name__)
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data/jobs.db')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'data', 'jobs.db')
 
 def get_app_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -27,7 +28,11 @@ def get_jobs():
 
 @app.route('/api/action', methods=['POST'])
 def job_action():
-    data = request.json()
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No data sent"}), 400
+    
     job_id = data.get('id')
     action = data.get('action') # either save or delete
 
