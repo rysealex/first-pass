@@ -19,6 +19,11 @@ def play_notification():
     except Exception as e:
         print(f"Audio error: {e}")
 
+def is_snoozed():
+    if os.path.exists('snooze.txt'):
+        with open('snooze.txt', 'r') as f:
+            return f.read().strip() == '1'
+
 def save_job(job_id, company, role, link, source):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -31,7 +36,9 @@ def save_job(job_id, company, role, link, source):
 
         conn.commit()
         print(f"New Job Found: {company} - {role}")
-        play_notification()
+        # check if the user has snoozed notifications
+        if not is_snoozed():
+            play_notification()
         return True
     except sqlite3.IntegrityError:
         # triggers if job is a duplicate

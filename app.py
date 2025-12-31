@@ -57,5 +57,13 @@ def job_action():
     conn.close()
     return jsonify({"status": "success"})
 
+@app.route('/api/snooze', methods=['POST'])
+def toggle_snooze():
+    data = request.get_json()
+    snooze_active = data.get('snooze', False)
+    with open('snooze.txt', 'w') as f:
+        f.write('1' if snooze_active else '0')
+    return jsonify({"status": "success", "snoozed": snooze_active})
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
