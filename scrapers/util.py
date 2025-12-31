@@ -1,6 +1,12 @@
 import sqlite3
 import os
+import random
 from pygame import mixer
+
+MP3_PLAYLIST = [
+    '../static/audio/yeat.mp3',
+    '../static/audio/espeak.mp3'
+]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, 'data', 'jobs.db')
@@ -14,15 +20,18 @@ def play_notification():
             print("Audio skipped: Notification already playing")
             return
         
-        mixer.music.load('../static/audio/yeat.mp3')
+        # pick a song to play at random
+        song_to_play = random.choice(MP3_PLAYLIST)
+        mixer.music.load(song_to_play)
         mixer.music.play()
     except Exception as e:
         print(f"Audio error: {e}")
 
 def is_snoozed():
-    if os.path.exists('snooze.txt'):
-        with open('snooze.txt', 'r') as f:
-            return f.read().strip() == '1'
+    if not os.path.exists('snooze.txt'):
+        return False
+    with open('snooze.txt', 'r') as f:
+        return f.read().strip() == '1'
 
 def save_job(job_id, company, role, link, source):
     conn = sqlite3.connect(DB_PATH)
