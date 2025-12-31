@@ -66,4 +66,8 @@ def run_simplify_scraper():
     scrape_offseason_html()
         
 if __name__ == "__main__":
-    run_simplify_scraper()
+    while True:
+        print("Starting scheduled scraping process...")
+        run_simplify_scraper()
+        print("Scrape finished. Sleeping for 15 minutes...")
+        time.sleep(900) # 900 seconds = 15 minutes

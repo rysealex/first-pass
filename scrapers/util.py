@@ -1,11 +1,13 @@
 import sqlite3
 import os
 import random
+import time
 from pygame import mixer
 
 MP3_PLAYLIST = [
     '../static/audio/yeat.mp3',
-    '../static/audio/espeak.mp3'
+    '../static/audio/espeak.mp3',
+    '../static/audio/topgun.mp3'
 ]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +26,12 @@ def play_notification():
         song_to_play = random.choice(MP3_PLAYLIST)
         mixer.music.load(song_to_play)
         mixer.music.play()
+
+        print(f"Playing: {song_to_play}")
+
+        while mixer.music.get_busy():
+            time.sleep(0.1) # wait for music to finish playing
+
     except Exception as e:
         print(f"Audio error: {e}")
 
