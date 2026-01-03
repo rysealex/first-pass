@@ -14,6 +14,9 @@ def get_app_connection():
 
 @app.route('/')
 def index():
+    # reset snooze on page load
+    with open('snooze.txt', 'w') as f:
+        f.write('0')
     return render_template('index.html')
 
 @app.route('/api/jobs')

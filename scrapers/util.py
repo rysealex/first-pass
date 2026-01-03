@@ -36,9 +36,9 @@ def play_notification():
         print(f"Audio error: {e}")
 
 def is_snoozed():
-    if not os.path.exists('snooze.txt'):
+    if not os.path.exists('../snooze.txt'):
         return False
-    with open('snooze.txt', 'r') as f:
+    with open('../snooze.txt', 'r') as f:
         return f.read().strip() == '1'
 
 def save_job(job_id, company, role, link, source):

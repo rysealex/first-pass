@@ -101,6 +101,9 @@
   </div>
 
   <script>
+    // track last job count to avoid unnecessary DOM updates
+    let lastJobCount = -1;
+
     async function fetchJobs() {
       try {
         const response = await fetch('/api/jobs');
@@ -111,6 +114,11 @@
         const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         document.getElementById('last-updated').innerText = `Last synced: ${timeString}`;
 
+        if (jobs.length === lastJobCount) {
+          return; 
+        }
+        
+        lastJobCount = jobs.length;
         const container = document.getElementById('job-list');
         if (!container) return;
 
@@ -205,8 +213,8 @@
 
     window.onload = () => { 
       fetchJobs(); 
-      // refresh every 15 minutes
-      setInterval(fetchJobs, 900000); 
+      // check for new jobs every 60 seconds
+      setInterval(fetchJobs, 60000);
     };
   </script>
 </body>
