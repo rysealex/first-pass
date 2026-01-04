@@ -60,6 +60,22 @@ def job_action():
     conn.close()
     return jsonify({"status": "success"})
 
+@app.route('/api/sda', methods=['POST'])
+def set_delete_all():
+    try:
+        # attempt to set all jobs as deleted
+        conn = get_app_connection()
+        conn.execute(
+            "UPDATE jobs SET status = 'deleted'"
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "success", "message": "All jobs have been set as deleted."}), 200
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/api/snooze', methods=['POST'])
 def toggle_snooze():
     data = request.get_json()
