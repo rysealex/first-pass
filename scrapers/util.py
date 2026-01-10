@@ -4,11 +4,19 @@ import random
 import time
 from pygame import mixer
 
-MP3_PLAYLIST = [
-    '../static/audio/yeat.mp3',
-    '../static/audio/espeak.mp3',
-    '../static/audio/topgun.mp3'
-]
+AUDIO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../static/audio'))
+
+def get_dynamic_playlist():
+    if not os.path.exists(AUDIO_DIR):
+        print(f"Audio directory not found: {AUDIO_DIR}")
+        return []
+
+    # gather all mp3 files in the audio directory
+    return [
+        os.path.join(AUDIO_DIR, f) 
+        for f in os.listdir(AUDIO_DIR) 
+        if f.lower().endswith('.mp3')
+    ]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, 'data', 'jobs.db')
@@ -17,6 +25,13 @@ def init_audio():
     mixer.init()
 
 def play_notification():
+
+    MP3_PLAYLIST = get_dynamic_playlist()
+    
+    if not MP3_PLAYLIST:
+        print("No audio files found for notification")
+        return
+
     try:
         if mixer.music.get_busy():
             print("Audio skipped: Notification already playing")
