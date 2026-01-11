@@ -80,4 +80,101 @@ cd firstpass
 pip install -r requirements.txt
 ```
 
-## 3. 
+### 3. Initialize Environment & Directories
+Before running the application, you must manually set up the local file structure and configuration.
+
+---
+
+### A. State Management (Snooze System)
+FirstPass uses a lightweight file-based state system to control global audio snoozing.
+
+1. Create an empty file named `snooze.txt` **in the parent directory of the project**.
+2. Add one of the following values:
+   - `0` → Snooze **OFF** (audio enabled)
+   - `1` → Snooze **ON** (audio muted)
+
+> **Note:** The Web UI automatically updates this file when the Snooze button is toggled—no restart required.
+
+---
+
+### B. Audio Assets
+Create a directory for notification sounds and add any `.mp3` files you want to use.
+
+```bash
+mkdir -p static/audio
+```
+The scraper will randomly select from these files when a new job is detected.
+High-energy, short audio clips are recommended for best UX.
+
+---
+
+### C. Database & Storage
+Create a directory to store the SQLite database used by both the scraper and the web server.
+
+```bash
+mkdir data
+```
+This directory will contain:
+jobs.db — the centralized SQLite database storing all discovered job postings.
+
+---
+
+### D. Environment Variables (Mailer Configuration)
+FirstPass uses a Gmail-based mailer to support one-click job handoff to your mobile device.
+Create a `.env` file in the root directory of the project:
+
+```bash
+GMAIL_USER=your_email@gmail.com
+GMAIL_APP_PASSWORD=your_app_password
+```
+> **Security Note:** Use a Gmail App Password, not your primary Gmail password.
+> App passwords can be generated in your Google Account security settings.
+
+---
+
+### 4. Database Initialization
+Before running the scraper or web server, initialize the SQLite database to create the required tables.
+
+```bash
+python init_db.py
+```
+This step only needs to be run once, unless you delete the database.
+
+---
+
+### 5. Run the Application
+FirstPass requires two independent processes running simultaneously. Open two terminal windows.
+
+#### Terminal 1 - Start the Scraper Engine
+
+```bash
+python simplify.py
+```
+Responsibilities:
+  - Continuously polls supported job boards
+  - Filters and inserts new postings into the database
+  - Triggers audio alerts on successful job detection
+
+#### Terminal 2 - Start the Web Dashboard
+
+```bash
+python app.py
+```
+Responsibilities:
+  - Serves the Flask + Tailwind web UI
+  - Manages snooze state and UI interactions
+  - Handles job filtering and email handoff logic
+  - Once both processes are running, navigate to:
+
+```bash
+http://localhost:5000
+```
+You should now see the live job dashboard, sync indicators, and snooze controls in action.
+
+---
+
+### 👨🏼‍💻 Developer
+**Alex Ryse** - Senior Computer Science Student @ CWU
+* **GitHub:** [@rysealex](https://github.com/rysealex)
+* **LinkedIn:** [Alex Ryse](https://www.linkedin.com/in/alex-ryse/)
+* **Portfolio:** [alexryse.com](https://alexryse.com)
